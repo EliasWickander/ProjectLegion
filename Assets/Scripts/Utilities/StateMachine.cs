@@ -9,6 +9,7 @@ public class StateMachine
     public Dictionary<Enum, State> m_states;
 
     private State m_currentState;
+    public Enum m_currentStateType;
 
     public StateMachine(Dictionary<Enum, State> states)
     {
@@ -37,7 +38,8 @@ public class StateMachine
             oldState.OnExit(newState);
         
         newState.OnEnter(oldState, param);
-        
+
+        m_currentStateType = state;
         m_currentState = newState;
     }
 }

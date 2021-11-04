@@ -32,9 +32,11 @@ public class State_FollowSpline : State
 
     public override void Update()
     {
+        //If an enemy unit is detected, start chasing that unit
         if (m_ownerUnit.Detect(out UnitBase detectedUnit))
         {
             m_ownerUnit.m_stateMachine.SetState(EUnitState.State_Chase, detectedUnit);
+            return;
         }
         
         if (m_pathPoints.Count > 0)
@@ -51,7 +53,7 @@ public class State_FollowSpline : State
 
     public override void OnExit(State nextState)
     {
-        m_currentPathPoint = Vector3.zero;
+        
     }
 
     private void HandlePathFollow()

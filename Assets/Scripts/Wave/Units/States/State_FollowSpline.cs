@@ -23,12 +23,11 @@ public class State_FollowSpline : State
 
             foreach (Transform pathPoint in pathPoints)
             {
-                Vector3 offset = m_ownerUnit.m_startOffset + pathPoint.TransformDirection(m_ownerUnit.m_startOffset);
+                Vector3 offset = m_ownerUnit.m_startOffset + -pathPoint.TransformDirection(m_ownerUnit.m_startOffset);
                 m_pathPoints.Enqueue(pathPoint.position + offset);
             }
 
             m_currentPathPoint = m_pathPoints.Peek();
-            
             Debug.DrawLine(m_ownerUnit.transform.position, m_currentPathPoint, Color.green, 5);
         }
     }
@@ -83,8 +82,11 @@ public class State_FollowSpline : State
             m_pathPoints.Dequeue();
                 
             //Set next path point if there is any
-            if(m_pathPoints.Count > 0)
+            if (m_pathPoints.Count > 0)
+            {
                 m_currentPathPoint = m_pathPoints.Peek();
+                Debug.DrawLine(m_ownerUnit.transform.position, m_currentPathPoint, Color.green, 5);
+            }
         }
     }
 

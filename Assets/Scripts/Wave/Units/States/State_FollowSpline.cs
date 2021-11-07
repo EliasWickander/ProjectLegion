@@ -8,7 +8,7 @@ public class State_FollowSpline : State
     
     private Queue<Vector3> m_pathPoints = new Queue<Vector3>();
     private Vector3 m_currentPathPoint = Vector3.zero;
-    
+
     public State_FollowSpline(UnitBase mOwner) : base(mOwner.gameObject)
     {
         m_ownerUnit = mOwner;
@@ -23,10 +23,13 @@ public class State_FollowSpline : State
 
             foreach (Transform pathPoint in pathPoints)
             {
-                m_pathPoints.Enqueue(pathPoint.position);
+                Vector3 offset = m_ownerUnit.m_startOffset + pathPoint.TransformDirection(m_ownerUnit.m_startOffset);
+                m_pathPoints.Enqueue(pathPoint.position + offset);
             }
 
             m_currentPathPoint = m_pathPoints.Peek();
+            
+            Debug.DrawLine(m_ownerUnit.transform.position, m_currentPathPoint, Color.green, 5);
         }
     }
 
@@ -38,6 +41,11 @@ public class State_FollowSpline : State
             m_ownerUnit.m_stateMachine.SetState(EUnitState.State_Chase, detectedUnit);
             return;
         }
+
+        // if (m_ownerUnit.IsPathObstructed(m_ownerUnit.transform.forward, m_ownerUnit.m_obstructionCheckRange))
+        // {
+        //     m_ownerUnit.m_stateMachine.SetState(EUnitState.State_Strafe_Default);
+        // }   
         
         if (m_pathPoints.Count > 0)
         {
@@ -55,7 +63,7 @@ public class State_FollowSpline : State
     {
         
     }
-
+    
     private void HandlePathFollow()
     {
         //Get direction to current path point (without taking y value into account)

@@ -20,8 +20,6 @@ public class State_Attack : State
         m_targetUnit = (UnitBase) param[0];
         
         m_targetUnit.m_attackers.Add(m_ownerUnit);
-        
-        Debug.Log(m_targetUnit);
     }
 
     public override void Update()

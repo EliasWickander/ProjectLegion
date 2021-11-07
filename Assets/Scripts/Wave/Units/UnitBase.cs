@@ -15,7 +15,8 @@ public enum EUnitState
     State_Idle,
     State_FollowSpline,
     State_Chase,
-    State_Strafe,
+    State_Strafe_Chase,
+    State_Strafe_Default,
     State_Attack,
     State_Death
 }
@@ -27,6 +28,8 @@ public enum UnitType
 }
 public class UnitBase : MonoBehaviour
 {
+    [HideInInspector] public UnitSpawner m_spawner;
+    
     public ETeam m_team;
     public float m_maxHealth = 100;
     public float m_patrolSpeed = 5;
@@ -35,6 +38,7 @@ public class UnitBase : MonoBehaviour
     public float m_attackRange = 2;
     public float m_attackRate = 1;
     public float m_damage = 10;
+    public float m_obstructionCheckRange = 2;
 
     private float m_currentHealth;
 
@@ -52,6 +56,9 @@ public class UnitBase : MonoBehaviour
     public UnitType m_unitType;
     public EUnitState m_currentState;
 
+    public Vector3 m_startOffset;
+    
+
     protected virtual void Awake()
     {
         m_collider = GetComponentInChildren<Collider>();
@@ -61,12 +68,21 @@ public class UnitBase : MonoBehaviour
             {EUnitState.State_Idle, new State_Idle(this)},
             {EUnitState.State_FollowSpline, new State_FollowSpline(this)},
             {EUnitState.State_Chase, new State_Chase(this)},
-            {EUnitState.State_Strafe, new State_Strafe(this)},
+            {EUnitState.State_Strafe_Chase, new State_Strafe_Chase(this)},
+            {EUnitState.State_Strafe_Default, new State_Strafe_Default(this)},
             {EUnitState.State_Attack, new State_Attack(this)},
             {EUnitState.State_Death, new State_Death(this)}
         };
         
         m_stateMachine = new StateMachine(states);
+    }
+
+    public void Init()
+    {
+        m_startOffset = transform.position - m_spawner.m_spawnPoint.position;
+
+        m_team = m_spawner.m_team;
+        m_stateMachine.SetState(EUnitState.State_FollowSpline, m_spawner.m_pathPoints, null);   
     }
 
     protected virtual void Start()
@@ -139,24 +155,44 @@ public class UnitBase : MonoBehaviour
         return m_team == ETeam.Red ? ETeam.Blue : ETeam.Red;
     }
     
-    public bool IsPathToTargetObstructed(Vector3 targetPos)
+    public bool IsPathObstructed(Vector3 direction, float obstructionCheckRange)
     {
         //TODO: Take into account ally units that are overlapping with this unit on start of raycast
         LayerMask allyMask = 1 << GetTeamLayer(m_team);
 
         Bounds ownerColBounds = m_collider.bounds;
-
-        Vector3 dirToTarget = targetPos - transform.position;
-        dirToTarget.y = 0;
+        
         
         Vector3 offset = transform.TransformDirection(new Vector3(0, 0, ownerColBounds.extents.z));
-        
-        Debug.DrawRay(ownerColBounds.center + offset, dirToTarget, Color.blue);
 
-        if (Physics.Raycast(ownerColBounds.center + offset, dirToTarget.normalized, out RaycastHit hit, dirToTarget.magnitude, allyMask))
+        //Check if a unit is in front of owner unit but not overlapping
+        if (Physics.Raycast(ownerColBounds.center + offset, direction, obstructionCheckRange, allyMask))
         {
             return true;
         }
+        
+        // Check if a unit is in front of owner unit and overlapping
+        // Vector3 topPos = ownerColBounds.center + new Vector3(0, ownerColBounds.extents.y, 0);
+        // Vector3 botPos = ownerColBounds.center + new Vector3(0, ownerColBounds.extents.y, 0);
+        // Collider[] overlappedUnits = Physics.OverlapCapsule(botPos, topPos, ownerColBounds.extents.x, allyMask);
+        //
+        // if (overlappedUnits.Length > 0)
+        // {
+        //     foreach (Collider overlappedUnit in overlappedUnits)
+        //     {
+        //         //Don't take self into account
+        //         if (overlappedUnit.transform.root == transform.root)
+        //             continue;
+        //
+        //         Vector3 dirToUnit = overlappedUnit.transform.position - transform.position;
+        //         dirToUnit.y = 0;
+        //
+        //         if (Vector3.Dot(dirToUnit, transform.forward) > 0)
+        //         {
+        //             return true;
+        //         }
+        //     }
+        // }
 
         return false;
     }
@@ -173,7 +209,12 @@ public class UnitBase : MonoBehaviour
         }
         else
         {
-            Debug.Log(name + " took " + damage + " damage");
+            //Debug.Log(name + " took " + damage + " damage");
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        m_collider = GetComponentInChildren<Collider>();
     }
 }

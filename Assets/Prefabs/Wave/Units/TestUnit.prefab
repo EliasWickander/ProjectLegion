@@ -223,17 +223,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_team: 1
   m_maxHealth: 100
-  m_patrolSpeed: 25
-  m_chaseSpeed: 25
+  m_patrolSpeed: 5
+  m_chaseSpeed: 5
   m_detectionRadius: 5
   m_attackRange: 2
   m_attackRate: 1
-  m_damage: 100
+  m_damage: 0
   m_collider: {fileID: 0}
   m_attackers: []
   m_timeToDie: 1
   m_isPendingDeath: 0
   m_unitType: 0
+  m_currentState: 0
 --- !u!1 &8174724005671067278
 GameObject:
   m_ObjectHideFlags: 0

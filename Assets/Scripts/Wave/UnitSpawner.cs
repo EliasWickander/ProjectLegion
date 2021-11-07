@@ -8,17 +8,19 @@ using Random = UnityEngine.Random;
 
 public class UnitSpawner : MonoBehaviour
 {
-    [SerializeField] private ETeam m_team;
+    public ETeam m_team;
     
-    [SerializeField] private UnitBase m_unitToSpawn;
-    [SerializeField] private Transform m_spawnPoint;
+    public UnitBase m_unitToSpawn;
+    public Transform m_spawnPoint;
+    public BezierSpline m_spline;
+    
     [SerializeField] private float m_spawnOffset = 1;
 
     [SerializeField] private bool m_canSpawn = false;
     [SerializeField] private float m_timeBetweenSpawns = 1;
     [SerializeField] private int m_spawnCap = 5;
 
-    [SerializeField] private Transform[] m_pathPoints;
+    public Transform[] m_pathPoints;
 
     private List<UnitBase> m_spawnedUnits = new List<UnitBase>();
     private float m_spawnTimer = 0;
@@ -37,9 +39,11 @@ public class UnitSpawner : MonoBehaviour
                 else
                 {
                     UnitBase spawnedUnit = Instantiate(m_unitToSpawn, GetRandomSpawnPoint(), Quaternion.identity);
-                    spawnedUnit.m_team = m_team;
-                    spawnedUnit.m_stateMachine.SetState(EUnitState.State_FollowSpline, m_pathPoints, null);
                     
+                    //Use pooling system and OnEnable instead of having an init method
+                    spawnedUnit.m_spawner = this;
+                    spawnedUnit.Init();
+
                     m_spawnedUnits.Add(spawnedUnit);
                     m_spawnTimer = 0;
                 }   

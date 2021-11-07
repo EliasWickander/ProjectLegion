@@ -37,9 +37,9 @@ public class State_Chase : State
         RotateToTargetUnit();
 
         //If path to target unit is obstructed, strafe around it
-        if (m_ownerUnit.IsPathToTargetObstructed(m_targetUnit.transform.position))
+        if (m_ownerUnit.IsPathObstructed(m_ownerUnit.transform.forward, m_ownerUnit.m_obstructionCheckRange))
         {
-            m_ownerUnit.m_stateMachine.SetState(EUnitState.State_Strafe, m_targetUnit);
+            m_ownerUnit.m_stateMachine.SetState(EUnitState.State_Strafe_Chase, m_targetUnit);
             return;
         }
 

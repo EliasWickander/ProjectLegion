@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class State_FollowSpline : State
 {
+
     private UnitBase m_ownerUnit = null;
     
     private Queue<Vector3> m_pathPoints = new Queue<Vector3>();
@@ -21,17 +22,68 @@ public class State_FollowSpline : State
         {
             Transform[] pathPoints = (Transform[])param[0];
 
-            foreach (Transform pathPoint in pathPoints)
+            bool isMirrored = IsMirrored(pathPoints);
+            
+            for (int i = 0; i < pathPoints.Length; i++)
             {
-                Vector3 offset = m_ownerUnit.m_startOffset + -pathPoint.TransformDirection(m_ownerUnit.m_startOffset);
-                m_pathPoints.Enqueue(pathPoint.position + offset);
-            }
+                Transform currentPathPoint = pathPoints[i];
+                
+                //If at the first path point, let the spawner spawn point count as the previous one
+                Transform prevPathPoint = i == 0 ? m_ownerUnit.m_spawner.m_spawnPoint : pathPoints[i - 1];
 
+                Vector3 dirToCurrentPathPoint = currentPathPoint.position - prevPathPoint.position;
+                dirToCurrentPathPoint.y = 0;
+                dirToCurrentPathPoint.Normalize();
+
+                Vector3 unitSpawnOffset = isMirrored ? -m_ownerUnit.m_startOffset : m_ownerUnit.m_startOffset;
+
+                //Get right offset by rotating spawn offset in the direction of the current path point
+                Quaternion rotToCurrentPathPoint = Quaternion.LookRotation(dirToCurrentPathPoint);
+                Vector3 rightOffset = rotToCurrentPathPoint * unitSpawnOffset;
+                
+                Vector3 frontOffset = Vector3.zero;
+                
+                //Get front offset by rotating spawn offset in the direction of the next path point
+                if (i < pathPoints.Length - 1)
+                {
+                    Transform nextPathPoint = pathPoints[i + 1];
+                    
+                    Vector3 dirToNextPathPoint = nextPathPoint.position - currentPathPoint.position;
+                    dirToNextPathPoint.y = 0;
+                    dirToNextPathPoint.Normalize();
+                
+                    Quaternion rotToNextPathPoint = Quaternion.LookRotation(dirToNextPathPoint);
+                
+                    frontOffset = rotToNextPathPoint * unitSpawnOffset;
+                
+                }
+
+                Vector3 offset = rightOffset + frontOffset;
+
+                m_pathPoints.Enqueue(currentPathPoint.position + offset);
+            }
+            
             m_currentPathPoint = m_pathPoints.Peek();
             Debug.DrawLine(m_ownerUnit.transform.position, m_currentPathPoint, Color.green, 5);
         }
     }
 
+    private bool IsMirrored(Transform[] pathPoints)
+    {
+        if (pathPoints.Length > 0)
+        {
+            Transform firstPathPoint = pathPoints[0];
+
+            Vector3 dirToFirstPathPoint = firstPathPoint.position - m_ownerUnit.m_spawner.m_spawnPoint.position;
+            dirToFirstPathPoint.y = 0;
+            dirToFirstPathPoint.Normalize();
+
+            return Vector3.Dot(dirToFirstPathPoint, Vector3.forward) < 0;
+        }
+
+        return false;
+    }
+    
     public override void Update()
     {
         //If an enemy unit is detected, start chasing that unit

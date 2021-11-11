@@ -66,7 +66,7 @@ public class UnitBase : MonoBehaviour
         Dictionary<Enum, State> states = new Dictionary<Enum, State>()
         {
             {EUnitState.State_Idle, new State_Idle(this)},
-            {EUnitState.State_FollowSpline, new State_FollowSpline(this)},
+            {EUnitState.State_FollowSpline, new State_FollowPath(this)},
             {EUnitState.State_Chase, new State_Chase(this)},
             {EUnitState.State_Strafe_Chase, new State_Strafe_Chase(this)},
             {EUnitState.State_Strafe_Default, new State_Strafe_Default(this)},

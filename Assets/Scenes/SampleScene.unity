@@ -317,7 +317,6 @@ MonoBehaviour:
   m_team: 0
   m_unitToSpawn: {fileID: 8174724004868979009, guid: a6f016e817554a04a858c636df831891, type: 3}
   m_spawnPoint: {fileID: 1943594570}
-  m_spline: {fileID: 0}
   m_spawnOffset: 2
   m_canSpawn: 1
   m_timeBetweenSpawns: 0.1
@@ -957,7 +956,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1760271826}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b5cf0b185b4a00a40afa95e2d0f1ff49, type: 3}
   m_Name: 
@@ -965,7 +964,6 @@ MonoBehaviour:
   m_team: 0
   m_unitToSpawn: {fileID: 8174724004868979009, guid: a6f016e817554a04a858c636df831891, type: 3}
   m_spawnPoint: {fileID: 995416411}
-  m_spline: {fileID: 0}
   m_spawnOffset: 2
   m_canSpawn: 1
   m_timeBetweenSpawns: 0.1

@@ -12,8 +12,7 @@ public class UnitSpawner : MonoBehaviour
     
     public UnitBase m_unitToSpawn;
     public Transform m_spawnPoint;
-    public BezierSpline m_spline;
-    
+
     [SerializeField] private float m_spawnOffset = 1;
 
     [SerializeField] private bool m_canSpawn = false;
